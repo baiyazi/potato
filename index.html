@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Potato 配音工具</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "PingFang SC", sans-serif;
+      --page: #f5eee4;
+      --page-deep: #eadbc7;
+      --surface: rgba(255, 252, 247, .94);
+      --surface-solid: #fffcf7;
+      --surface-soft: #f8efe3;
+      --text: #30251d;
+      --muted: #78695c;
+      --border: #e3d4c3;
+      --accent: #b95524;
+      --accent-hover: #92401a;
+      --accent-soft: #f5ddca;
+      --danger: #a7382d;
+      --shadow: 0 24px 60px rgba(85, 54, 30, .12);
+    }
+    * { box-sizing: border-box; }
+    html { min-width: 320px; background: var(--page); }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 8%, rgba(255, 255, 255, .92) 0, rgba(255, 255, 255, 0) 34%),
+        radial-gradient(circle at 88% 92%, rgba(205, 124, 69, .16) 0, rgba(205, 124, 69, 0) 36%),
+        linear-gradient(145deg, var(--page) 0%, var(--page-deep) 100%);
+      background-attachment: fixed;
+    }
+    main { width: min(860px, calc(100% - 40px)); margin: 56px auto; }
+    header { margin: 0 4px 26px; }
+    h1 { margin: 0 0 10px; font-size: clamp(32px, 5vw, 48px); line-height: 1.08; letter-spacing: -0.045em; }
+    header p { margin: 0; color: var(--muted); font-size: 16px; line-height: 1.6; }
+    .card {
+      background: var(--surface);
+      border: 1px solid rgba(227, 212, 195, .9);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    label { display: block; margin: 0 0 9px; font-weight: 700; color: #46372c; }
+    textarea, select, input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: var(--surface-solid);
+      color: var(--text);
+      font: inherit;
+      transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    textarea:hover, select:hover { border-color: #cdb89f; }
+    textarea:focus, select:focus, input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px rgba(185, 85, 36, .13);
+    }
+    textarea { min-height: 250px; resize: vertical; padding: 16px; line-height: 1.7; }
+    select { min-height: 48px; padding: 11px 38px 11px 13px; cursor: pointer; }
+    input[type="range"] { accent-color: var(--accent); }
+    .count { margin-top: 7px; text-align: right; color: var(--muted); font-size: 13px; }
+    details.syntax-help { margin-top: 12px; border: 1px solid var(--border); border-radius: 14px; background: rgba(248, 239, 227, .64); }
+    details.syntax-help summary { padding: 12px 14px; color: var(--accent-hover); font-weight: 700; cursor: pointer; }
+    .syntax-content { padding: 0 14px 14px; color: #59483a; font-size: 14px; line-height: 1.65; }
+    .syntax-content p { margin: 0 0 10px; }
+    .syntax-content code { padding: 2px 6px; border-radius: 6px; background: var(--accent-soft); color: #743415; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .syntax-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; }
+    .syntax-example { margin-top: 11px; padding: 10px 12px; border-radius: 10px; background: var(--surface-solid); border: 1px dashed #d8c2aa; word-break: break-word; }
+    .grid { display: grid; grid-template-columns: .8fr 1.2fr 1fr; gap: 18px; margin-top: 18px; }
+    .speed-row { display: flex; align-items: center; gap: 12px; }
+    .speed-row output { min-width: 48px; color: var(--accent); font-weight: 750; font-variant-numeric: tabular-nums; }
+    #generate {
+      width: 100%;
+      min-height: 50px;
+      margin-top: 24px;
+      padding: 13px 18px;
+      border: 0;
+      border-radius: 14px;
+      background: var(--accent);
+      color: #fffaf5;
+      box-shadow: 0 10px 24px rgba(185, 85, 36, .22);
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+    }
+    #generate:hover { background: var(--accent-hover); box-shadow: 0 12px 28px rgba(146, 64, 26, .26); transform: translateY(-1px); }
+    #generate:active { transform: translateY(0); }
+    button:focus-visible, a:focus-visible { outline: 3px solid rgba(185, 85, 36, .28); outline-offset: 3px; }
+    button:disabled { cursor: wait; opacity: .55; }
+    .translation { margin-top: 20px; padding: 17px 18px; border-radius: 16px; background: var(--surface-soft); border: 1px solid var(--border); }
+    .translation[hidden] { display: none; }
+    .translation-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .translation-title { font-weight: 700; }
+    .refresh { min-height: 36px; border: 0; border-radius: 9px; background: var(--accent-soft); padding: 7px 11px; color: var(--accent-hover); font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; }
+    .refresh:hover { background: #efd0b8; }
+    #translationText { margin: 0; white-space: pre-wrap; line-height: 1.7; color: #4d3f34; }
+    #translationText.loading { color: var(--muted); }
+    #status { min-height: 24px; margin: 16px 0 0; color: var(--muted); }
+    #status.error { color: var(--danger); }
+    #result { display: none; margin-top: 18px; padding-top: 20px; border-top: 1px solid var(--border); }
+    audio { width: 100%; }
+    .download { display: inline-block; margin-top: 13px; color: var(--accent-hover); font-weight: 700; text-underline-offset: 4px; }
+    footer { margin-top: 18px; padding: 0 12px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+    @media (max-width: 760px) {
+      body { background-attachment: scroll; }
+      main { width: min(100% - 28px, 620px); margin: 28px auto 36px; }
+      header { margin: 0 2px 20px; }
+      h1 { font-size: clamp(30px, 10vw, 40px); }
+      .card { padding: 20px; border-radius: 20px; }
+      textarea { min-height: 215px; }
+      .grid { grid-template-columns: 1fr; gap: 15px; }
+      .speed-row { min-height: 48px; }
+    }
+
+    @media (max-width: 430px) {
+      main { width: calc(100% - 20px); margin: 18px auto 28px; }
+      header { margin-bottom: 16px; padding: 0 4px; }
+      header p { font-size: 14px; }
+      .card { padding: 15px; border-radius: 17px; }
+      textarea { min-height: 190px; padding: 13px; }
+      .translation { padding: 14px; }
+      .syntax-grid { grid-template-columns: 1fr; }
+      .translation-head { align-items: flex-start; }
+      .refresh { flex: 0 0 auto; }
+      #generate { min-height: 52px; }
+      footer { padding: 0 8px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Potato 配音工具</h1>
+      <p>输入文本，生成可试听、可下载的 MP3 配音。</p>
+    </header>
+    <section class="card">
+      <label for="text">配音文本</label>
+      <textarea id="text" maxlength="5000" placeholder="在这里输入需要朗读的内容……">你好，欢迎使用 Potato 配音工具。</textarea>
+      <div class="count"><span id="count">0</span> / 5000</div>
+      <details class="syntax-help">
+        <summary>如何在文本中插入停顿？</summary>
+        <div class="syntax-content">
+          <p>在需要停顿的位置插入以下标记。标记不会被朗读，外语翻译时也会保留原位置。</p>
+          <div class="syntax-grid">
+            <span><code>|</code> 短停顿 · 300ms</span>
+            <span><code>||</code> 中停顿 · 700ms</span>
+            <span><code>|||</code> 长停顿 · 1.2s</span>
+            <span><code>[[pause:800ms]]</code> 精确停顿</span>
+          </div>
+          <div class="syntax-example">示例：大家好，<code>[[pause:800ms]]</code>今天介绍一个新工具。<code>[[pause:1.5s]]</code>让我们开始吧。</div>
+          <p style="margin:10px 0 0">范围：单次 50ms–10s，总计不超过 60s。需要朗读竖线时请输入 <code>\|</code>。</p>
+        </div>
+      </details>
+
+      <div class="grid">
+        <div>
+          <label for="language">配音语言</label>
+          <select id="language"></select>
+        </div>
+        <div>
+          <label for="voice">音色风格</label>
+          <select id="voice"></select>
+        </div>
+        <div>
+          <label for="speed">语速</label>
+          <div class="speed-row">
+            <input id="speed" type="range" min="0.5" max="2" step="0.1" value="1">
+            <output id="speedValue">1.0×</output>
+          </div>
+        </div>
+      </div>
+
+      <section id="translationPanel" class="translation" hidden>
+        <div class="translation-head">
+          <span id="translationTitle" class="translation-title">翻译预览</span>
+          <button id="refreshTranslation" class="refresh" type="button">重新翻译</button>
+        </div>
+        <p id="translationText"></p>
+      </section>
+
+      <button id="generate">生成配音</button>
+      <p id="status" role="status"></p>
+      <div id="result">
+        <audio id="audio" controls></audio>
+        <a id="download" class="download" download>下载 MP3</a>
+      </div>
+    </section>
+    <footer>本地运行 · 无需 API Key · 生成时需要联网访问 Microsoft Edge TTS</footer>
+  </main>
+
+  <script>
+    const text = document.querySelector('#text');
+    const count = document.querySelector('#count');
+    const language = document.querySelector('#language');
+    const voice = document.querySelector('#voice');
+    const speed = document.querySelector('#speed');
+    const speedValue = document.querySelector('#speedValue');
+    const generate = document.querySelector('#generate');
+    const status = document.querySelector('#status');
+    const result = document.querySelector('#result');
+    const audio = document.querySelector('#audio');
+    const download = document.querySelector('#download');
+    const translationPanel = document.querySelector('#translationPanel');
+    const translationTitle = document.querySelector('#translationTitle');
+    const translationText = document.querySelector('#translationText');
+    const refreshTranslation = document.querySelector('#refreshTranslation');
+    let voiceData = [];
+    let languageData = [];
+    let translationTimer;
+    let translationSequence = 0;
+
+    function updateTextCount() { count.textContent = text.value.length; }
+    function updateSpeed() { speedValue.value = `${Number(speed.value).toFixed(1)}×`; }
+    text.addEventListener('input', () => {
+      updateTextCount();
+      clearTimeout(translationTimer);
+      translationTimer = setTimeout(updateTranslation, 700);
+    });
+    speed.addEventListener('input', updateSpeed);
+    updateTextCount();
+    updateSpeed();
+
+    fetch('/api/voices')
+      .then(response => response.json())
+      .then(data => {
+        languageData = data.languages;
+        voiceData = data.voices;
+        for (const item of languageData) {
+          const option = document.createElement('option');
+          option.value = item.id;
+          option.textContent = item.name;
+          language.appendChild(option);
+        }
+        renderVoices();
+      });
+
+    function currentLanguage() {
+      return languageData.find(item => item.id === language.value);
+    }
+
+    function renderVoices() {
+      voice.replaceChildren();
+      for (const item of voiceData.filter(item => item.language === language.value)) {
+        const option = document.createElement('option');
+        option.value = item.id;
+        option.textContent = `${item.name} · ${item.detail}`;
+        voice.appendChild(option);
+      }
+      updateTranslation();
+    }
+
+    async function updateTranslation() {
+      const selectedLanguage = currentLanguage();
+      if (!selectedLanguage || selectedLanguage.id === 'zh-CN') {
+        translationPanel.hidden = true;
+        translationText.textContent = '';
+        return;
+      }
+
+      translationPanel.hidden = false;
+      translationTitle.textContent = `翻译预览 · ${selectedLanguage.name}`;
+      if (!text.value.trim()) {
+        translationText.textContent = '输入文本后将在这里显示译文。';
+        return;
+      }
+
+      const requestSequence = ++translationSequence;
+      translationText.className = 'loading';
+      translationText.textContent = '正在翻译……';
+      try {
+        const response = await fetch('/api/translate', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({text: text.value, target_language: selectedLanguage.id})
+        });
+        const data = await response.json();
+        if (requestSequence !== translationSequence) return;
+        if (!response.ok) throw new Error(data.error || '翻译失败');
+        translationText.className = '';
+        translationText.textContent = data.translated_text;
+      } catch (error) {
+        if (requestSequence !== translationSequence) return;
+        translationText.className = '';
+        translationText.textContent = `翻译失败：${error.message}`;
+      }
+    }
+
+    language.addEventListener('change', renderVoices);
+    refreshTranslation.addEventListener('click', updateTranslation);
+
+    generate.addEventListener('click', async () => {
+      status.className = '';
+      result.style.display = 'none';
+      generate.disabled = true;
+      generate.textContent = '正在生成……';
+      status.textContent = '正在连接配音服务，请稍候。';
+      try {
+        const response = await fetch('/api/tts', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({text: text.value, voice: voice.value, speed: Number(speed.value)})
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || '生成失败');
+        const url = `${data.audio_url}?t=${Date.now()}`;
+        audio.src = url;
+        download.href = url;
+        download.download = data.filename;
+        if (data.translated) {
+          translationPanel.hidden = false;
+          translationText.className = '';
+          translationText.textContent = data.spoken_text;
+        }
+        result.style.display = 'block';
+        const pauseSummary = data.pause_count
+          ? `，包含 ${data.pause_count} 处停顿，共 ${data.pause_seconds} 秒`
+          : '';
+        status.textContent = `已生成 ${data.characters} 个字符的配音${pauseSummary}。`;
+      } catch (error) {
+        status.className = 'error';
+        status.textContent = error.message;
+      } finally {
+        generate.disabled = false;
+        generate.textContent = '生成配音';
+      }
+    });
+  </script>
+</body>
+</html>
