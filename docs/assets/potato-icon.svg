@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Potato 配音工具图标</title>
+  <desc id="desc">一颗戴着耳机、正在发声的土豆</desc>
+  <defs>
+    <linearGradient id="background" x1="72" y1="42" x2="438" y2="474" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF8EE"/>
+      <stop offset="1" stop-color="#EBCFB0"/>
+    </linearGradient>
+    <linearGradient id="potato" x1="157" y1="119" x2="358" y2="402" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D9874E"/>
+      <stop offset="1" stop-color="#A94A22"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#6D321C" flood-opacity="0.22"/>
+    </filter>
+  </defs>
+
+  <rect x="20" y="20" width="472" height="472" rx="112" fill="url(#background)"/>
+  <rect x="20.75" y="20.75" width="470.5" height="470.5" rx="111.25" fill="none" stroke="#D9B38D" stroke-width="1.5"/>
+
+  <g filter="url(#shadow)">
+    <path d="M260 103c83 0 139 61 139 154 0 98-55 158-143 158-91 0-145-57-145-151 0-50 14-92 42-120 27-27 62-41 107-41Z" fill="url(#potato)"/>
+    <path d="M255 126c65 0 111 46 118 119" fill="none" stroke="#EBA16D" stroke-width="18" stroke-linecap="round" opacity="0.55"/>
+
+    <g fill="#813819" opacity="0.42">
+      <ellipse cx="195" cy="196" rx="15" ry="10" transform="rotate(-18 195 196)"/>
+      <ellipse cx="310" cy="178" rx="12" ry="9" transform="rotate(22 310 178)"/>
+      <ellipse cx="324" cy="322" rx="16" ry="10" transform="rotate(-16 324 322)"/>
+      <ellipse cx="188" cy="335" rx="11" ry="8" transform="rotate(18 188 335)"/>
+    </g>
+
+    <path d="M154 253v-20c0-61 45-108 103-108s103 47 103 108v20" fill="none" stroke="#3A2B24" stroke-width="24" stroke-linecap="round"/>
+    <rect x="132" y="236" width="54" height="94" rx="25" fill="#3A2B24"/>
+    <rect x="328" y="236" width="54" height="94" rx="25" fill="#3A2B24"/>
+    <rect x="145" y="251" width="23" height="64" rx="11.5" fill="#FFF7EB" opacity="0.88"/>
+    <rect x="346" y="251" width="23" height="64" rx="11.5" fill="#FFF7EB" opacity="0.88"/>
+
+    <path d="M211 270c11-11 28-11 39 0" fill="none" stroke="#FFF7EB" stroke-width="12" stroke-linecap="round"/>
+    <path d="M273 270c11-11 28-11 39 0" fill="none" stroke="#FFF7EB" stroke-width="12" stroke-linecap="round"/>
+    <path d="M221 316c20 19 52 19 72 0" fill="none" stroke="#FFF7EB" stroke-width="14" stroke-linecap="round"/>
+  </g>
+
+  <g fill="none" stroke="#B95524" stroke-width="13" stroke-linecap="round">
+    <path d="M414 203c16 15 16 39 0 54"/>
+    <path d="M443 177c32 30 32 78 0 108" opacity="0.72"/>
+  </g>
+</svg>
